@@ -1,0 +1,42 @@
+#! /usr/bin/env python3
+
+import argparse
+import os
+
+from oclintscripts import environment
+from oclintscripts import path
+from oclintscripts import process
+
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('-clean', '--clean', action="store_true")
+args = arg_parser.parse_args()
+
+def clean_module():
+    build_path = path.build.clang_build_dir
+    path.rm_f(build_path)
+    install_dir = path.build.clang_install_dir
+    path.rm_f(install_dir)
+
+def setup_prebuilt_binary():
+    build_path = path.build.clang_build_dir
+    install_path = path.build.clang_install_dir
+
+    if environment.is_darwin():
+        binary_url = path.url.clang_prebuilt_binary_for_macos
+    elif environment.is_aarch64():
+        binary_url = path.url.clang_prebuilt_binary_for_aarch64
+    else:
+        binary_url = path.url.clang_prebuilt_binary_for_ubuntu_lts_20
+
+    current_dir = os.getcwd()
+    path.mkdir_p(build_path)
+    path.cd(build_path)
+    process.call('curl -L -o prebuilt.tar.xz ' + binary_url)
+    path.mkdir_p(install_path)
+    process.call('tar xf prebuilt.tar.xz -C ' + install_path + ' --strip-components=1')
+    path.cd(current_dir)
+
+
+if args.clean:
+    clean_module()
+setup_prebuilt_binary()

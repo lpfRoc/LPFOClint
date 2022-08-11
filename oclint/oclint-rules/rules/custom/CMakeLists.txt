@@ -1,0 +1,12 @@
+SET(LIST_OF_RULES
+    SafeDic
+    CollectionViewCellInit
+    WindowVisible
+    loadFunction
+    DeallocFunction
+    TableViewUpdates
+    TableViewAddSubview
+    CollectionViewAddSubview
+    TableViewEstimatedHeight
+    )
+BUILD_DYNAMIC_RULES("${LIST_OF_RULES}")

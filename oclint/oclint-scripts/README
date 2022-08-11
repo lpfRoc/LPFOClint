@@ -1,0 +1,12 @@
+Quick Start
+-------------------------------------------------------------------------------
+
+./make - Delete existing build, check out dependencies, build LLVM/Clang,
+         build OCLint in optimized mode, bundle binaries and libraries
+         together, and finally archive everything at ../build folder
+
+Detail description can be found at
+    http://oclint.org/docs/intro/build.html
+
+Compiling in debug mode and enabling testing, please look at
+    http://oclint.org/docs/devel/compiletest.html

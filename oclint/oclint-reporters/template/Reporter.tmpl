@@ -1,0 +1,21 @@
+#include "oclint/Reporter.h"
+
+using namespace oclint;
+
+class {{REPORTER_CLASS_NAME}}Reporter : public Reporter
+{
+public:
+    virtual const std::string name() const override
+    {
+        return "{{REPORTER_NAME}}";
+    }
+
+    virtual void report(Results *results, std::ostream &out) override
+    {
+    }
+};
+
+extern "C" Reporter* create()
+{
+  return new {{REPORTER_CLASS_NAME}}Reporter();
+}

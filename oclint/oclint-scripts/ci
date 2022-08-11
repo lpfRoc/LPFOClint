@@ -1,0 +1,54 @@
+#! /usr/bin/env python3
+
+import argparse
+import sys
+import os
+
+from oclintscripts import environment
+from oclintscripts import path
+from oclintscripts import process
+
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('-reset', '--reset', action="store_true")
+arg_parser.add_argument('-setup', '--setup', action="store_true")
+arg_parser.add_argument('-release', '--release', action="store_true")
+arg_parser.add_argument('-archive', '--archive', action="store_true")
+arg_parser.add_argument('-j', type=int, default=0)
+args = arg_parser.parse_args()
+
+def upload_snapshot():
+    process.call(f'{sys.executable} upload')
+
+if args.reset:
+    path.rm_f(path.build_root)
+    path.rm_f(path.source.clang_dir)
+    path.rm_f(path.source.googletest_dir)
+    path.rm_f(path.source.json_compilation_database_dir)
+    path.rm_f(path.source.xcodebuild_dir)
+    sys.exit(0)
+
+if args.setup:
+    current_dir = os.getcwd()
+    path.cd(path.root_dir)
+    process.call('git clone ' + path.url.json_compilation_database)
+    if environment.is_darwin():
+        process.call('git clone ' + path.url.xcodebuild)
+    path.cd(current_dir)
+    process.call(f'{sys.executable} clang')
+    if not args.release:
+        process.call(f'{sys.executable} googleTest co')
+        process.call(f'{sys.executable} googleTest build -clean' + process.j_flag(args.j))
+
+if args.release:
+    process.call(f'{sys.executable} build -clean -release' + process.j_flag(args.j))
+else:
+    process.call(f'{sys.executable} test -clean' + process.j_flag(args.j))
+    process.call(f'{sys.executable} build -clean' + process.j_flag(args.j))
+process.call(f'{sys.executable} bundle')
+if environment.is_unix() and not args.release:
+    process.call(f'{sys.executable} dogFooding -enable-clang-static-analyzer')
+if args.archive:
+    if args.release:
+        process.call(f'{sys.executable} bundle -archive -release')
+    else:
+        process.call(f'{sys.executable} bundle -archive')

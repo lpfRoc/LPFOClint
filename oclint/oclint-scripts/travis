@@ -1,0 +1,22 @@
+#! /bin/sh -e
+
+./clang
+if [ "$1" = "build" ]
+then
+    ./build -no-ninja
+    ./bundle -archive
+elif [ "$1" = "docgen" ]
+then
+    ./docGen
+else
+    ./googleTest co
+    ./googleTest build
+    shift
+    MODULE="$1"
+    shift
+    for dep in $*
+    do
+        ./test "$dep" -as-dep -no-ninja
+    done
+    ./test "$MODULE"
+fi
